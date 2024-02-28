@@ -1,4 +1,5 @@
 import { useState } from "react"
+import ollama from 'ollama'
 
 type Message = {
     owner: string;
@@ -12,13 +13,26 @@ function App() {
     const [prompt, setPrompt] = useState<string>("");
     const maxTokens = 250;
     
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         const m: Message = {owner: "You", message: prompt};
         setHistory([...history, m]);
         setGenerating(true);
+        const p = createPrompt();
+        console.log(p);
+        const response = await ollama.chat({model: 'llama2', messages: [{ role: 'user', content: p}]});
         setPrompt("");
         setTextareaCount(0);
-        setTimeout(() => {setHistory([...history, m, {owner: "bot", message: "Very Real Response"}]); setGenerating(false);}, 400);
+        setTimeout(() => {setHistory([...history, m, {owner: "bot", message: response.message.content}]); setGenerating(false);}, 400);
+    }
+
+    const createPrompt = () => {
+        let header = "Hey, you are a chat bot for a company!\nThese are you previous messages:\'\n"
+        history.forEach(m => header += `${m.owner}: ${m.message}\n`);
+        header += '\'\n';
+        // Products
+        header += `This is your latest prompt: \'${prompt}\'`;
+        header += 'Respond to this message serious and professional, keep it to minimum 100 words.';
+        return header;
     }
 
     return (
@@ -38,7 +52,7 @@ function App() {
                             maxLength={maxTokens}
                             value={prompt}
                             onChange={e => {setTextareaCount(e.target.value.length); setPrompt(e.target.value);}}/>
-                        <button type="submit" onClick={handleSubmit}>Submit</button>
+                        <button disabled={generating} type="submit" onClick={handleSubmit}>Submit</button>
                     </div>
                 </div>
             </div>
