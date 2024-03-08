@@ -15,11 +15,12 @@ function App() {
     
     const handleSubmit = async () => {
         const m: Message = {role: "user", content: prompt};
+        setGenerating(true);
         const response = await ollama.chat({model: 'llama2', messages: [...history, m]});
         setPrompt("");
         setTextareaCount(0);
-        setHistory([...history, m, {role: response.message.role, content: response.message.content}]); setGenerating(false);
-        console.log(history)
+        setHistory([...history, m, {role: response.message.role, content: response.message.content}]);
+        setGenerating(false);
     }
 
     return (
