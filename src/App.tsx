@@ -2,37 +2,24 @@ import { useState } from "react"
 import ollama from 'ollama'
 
 type Message = {
-    owner: string;
-    message: string;
+    role: string;
+    content: string;
 }
 
 function App() {
-    const [history, setHistory] = useState<Message[]>([]);
+    const [history, setHistory] = useState<Message[]>([{role: 'system', content: createSystemPrompt()}]);
     const [generating, setGenerating] = useState<boolean>(false);
     const [textareaCount, setTextareaCount] = useState<number>(0);
     const [prompt, setPrompt] = useState<string>("");
     const maxTokens = 250;
     
     const handleSubmit = async () => {
-        const m: Message = {owner: "You", message: prompt};
-        setHistory([...history, m]);
-        setGenerating(true);
-        const p = createPrompt();
-        console.log(p);
-        const response = await ollama.chat({model: 'llama2', messages: [{ role: 'user', content: p}]});
+        const m: Message = {role: "user", content: prompt};
+        const response = await ollama.chat({model: 'llama2', messages: [...history, m]});
         setPrompt("");
         setTextareaCount(0);
-        setTimeout(() => {setHistory([...history, m, {owner: "bot", message: response.message.content}]); setGenerating(false);}, 400);
-    }
-
-    const createPrompt = () => {
-        let header = "Hey, you are a chat bot for a company!\nThese are you previous messages:\'\n"
-        history.forEach(m => header += `${m.owner}: ${m.message}\n`);
-        header += '\'\n';
-        // Products
-        header += `This is your latest prompt: \'${prompt}\'`;
-        header += 'Respond to this message serious and professional, keep it to minimum 100 words.';
-        return header;
+        setHistory([...history, m, {role: response.message.role, content: response.message.content}]); setGenerating(false);
+        console.log(history)
     }
 
     return (
@@ -40,7 +27,11 @@ function App() {
             <h1>AI Chat Bot</h1>
             <div className="chat">
                 <div className="chat-history">
-                    {history.map(h => <p>{h.owner}: {h.message}</p>)}
+                    {history.map(h => {
+                        if (h.role == 'system')
+                            return;
+                        return <p>{h.role}: {h.content}</p>
+                    })}
                 </div>
                 <div className="textarea-wrapper">
                     <div className="above-input">
@@ -59,6 +50,27 @@ function App() {
 
         </>
     )
+}
+
+const createSystemPrompt = () => {
+    let header = `
+Reageer altijd in het nederlands.
+Jij bent een online chat bot voor een Keukentafel maker. Jij helpt de klant met het vinden van het beste product.
+Reageer alleen op relevante vragen, alles wat er niet mee te maken heeft moet je negeren.
+Als er spraken is van opsomming van de prijzen, geef een duidelijk overzicht over welke getallen het gaat.
+Dit zijn de producten:
+1. Kwartsen Werkbladen: Prijs: €200 per vierkante meter
+2. Granieten Werkbladen: Prijs: €250 per vierkante meter
+
+Extra items:
+Aanbrengen van sealer: €20 per vierkante meter
+Achterwand installatie: €60 per strekkende meter
+Inmeten en opmeten: €200 per bezoek
+Randafwerking (bijv. afgeschuind, afgerond): €50 per strekkende meter
+Uitsparing voor onderbouw spoelbak: €100 per stuk
+Installatie: €200 per meter
+`
+    return header;
 }
 
 export default App
