@@ -1,83 +1,158 @@
-:root {
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+/* General Styles */
 body {
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-
-h1 {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #0f0f0f;
+    color: #d1d1d1;
+    overflow: hidden; /* Prevent scrollbars on body */
+  }
+  
+  /* Heading */
+  h1 {
+    font-size: 2.5rem;
+    color: #00ffff;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
     text-align: center;
-    margin-top: 20px;
-}
-
-.chat {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-}
-
-.chat-history {
+    margin-top: 2rem;
+    animation: neon-glow 1.5s ease-in-out infinite alternate;
+  }
+  
+  /* Chat Container */
+  .chat {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 1rem;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+    animation: slide-up 0.5s ease-out;
+  }
+  
+  /* Chat History */
+  .chat-history {
+    height: 500px;
     overflow-y: auto;
-    padding: 10px;
-    flex-grow: 1;
-    max-height: calc(100vh - 275px);
-}
-
-.chat-input {
+    padding: 1rem;
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.3);
+  }
+  
+  .chat-history::-webkit-scrollbar {
+    width: 12px;
+  }
+  
+  .chat-history::-webkit-scrollbar-track {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+  }
+  
+  .chat-history::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 255, 255, 0.3);
+    border-radius: 10px;
+    border: 2px solid rgba(0, 0, 0, 0.5);
+  }
+  
+  .chat-history::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 255, 255, 0.5);
+  }
+  
+  .chat-history p {
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+    border-radius: 5px;
+    opacity: 0;
+    animation: fade-in 0.5s ease-out forwards;
+  }
+  
+  .chat-history p:nth-child(even) {
+    background-color: rgba(0, 255, 255, 0.1);
+  }
+  
+  /* Textarea Wrapper */
+  .textarea-wrapper {
     display: flex;
     flex-direction: column;
-    padding: 10px;
-}
-
-.above-input {
+    margin-top: 1rem;
+  }
+  
+  .above-input {
     display: flex;
-    justify-content: space-between;
-    padding-left: 10px;
-}
-
-.textarea-wrapper {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    z-index: 9999;
-}
-
-.textarea-container {
+    justify-content: flex-end;
+    margin-bottom: 0.5rem;
+  }
+  
+  .above-input p {
+    font-size: 0.8rem;
+    color: #00ffff;
+  }
+  
+  .textarea-container {
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: 10px;
-}
-
-textarea {
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 5px;
+    padding: 0.5rem;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+  }
+  
+  textarea {
+    flex-grow: 1;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #d1d1d1;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 5px;
     resize: none;
-    padding: 10px;
+    font-size: 1rem;
+    animation: slide-up 0.5s ease-out;
+  }
+  
+  button {
+    background-color: #00ffff;
+    color: #0f0f0f;
     border: none;
-    outline: none;
-    font-size: 16px;
-    min-height: 100px;
-    max-height: 200px;
-    width: calc(100% - 80px);
-}
-
-button {
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    border: none;
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    margin-left: 0.5rem;
     cursor: pointer;
-    margin-left: 10px;
-}
+    transition: background-color 0.3s ease;
+    animation: slide-up 0.5s ease-out;
+  }
+  
+  button:hover {
+    background-color: #00cccc;
+  }
+  
+  button:disabled {
+    background-color: rgba(0, 255, 255, 0.3);
+    cursor: not-allowed;
+  }
+  
+  /* Animations */
+  @keyframes neon-glow {
+    from {
+      text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    }
+    to {
+      text-shadow: 0 0 20px rgba(0, 255, 255, 1);
+    }
+  }
+  
+  @keyframes slide-up {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
