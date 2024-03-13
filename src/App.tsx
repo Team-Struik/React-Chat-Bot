@@ -1,5 +1,11 @@
 import { useState } from "react"
-import ollama from 'ollama'
+import OpenAI from 'openai';
+
+
+const openai = new OpenAI({
+    apiKey: process.env['OPENAI_API_KEY'],
+  });
+
 
 type Message = {
     role: string;
@@ -16,10 +22,13 @@ function App() {
     const handleSubmit = async () => {
         const m: Message = {role: "user", content: prompt};
         setGenerating(true);
-        const response = await ollama.chat({model: 'llama2', messages: [...history, m]});
+        const response = await openai.chat.completions.create({
+            messages: [{ role: 'user', content: 'Say this is a test' }],
+            model: 'gpt-3.5-turbo',
+          });
         setPrompt("");
         setTextareaCount(0);
-        setHistory([...history, m, {role: response.message.role, content: response.message.content}]);
+        setHistory([...history, m, {role: 'system', content: response.data.choices[0].message.content}]);
         setGenerating(false);
     }
 
