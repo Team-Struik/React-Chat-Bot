@@ -1,34 +1,31 @@
 import { useState } from "react"
 import OpenAI from 'openai';
+import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
+import { OPENAI_KEY } from "../keys.json"
 
 
 const openai = new OpenAI({
-    apiKey: process.env['OPENAI_API_KEY'],
-  });
-
-
-type Message = {
-    role: string;
-    content: string;
-}
+    apiKey: OPENAI_KEY,
+    dangerouslyAllowBrowser: true
+});
 
 function App() {
-    const [history, setHistory] = useState<Message[]>([{role: 'system', content: createSystemPrompt()}]);
+    const [history, setHistory] = useState<ChatCompletionMessageParam[]>([{role: 'system', content: createSystemPrompt()}]);
     const [generating, setGenerating] = useState<boolean>(false);
     const [textareaCount, setTextareaCount] = useState<number>(0);
     const [prompt, setPrompt] = useState<string>("");
     const maxTokens = 250;
-    
+
     const handleSubmit = async () => {
-        const m: Message = {role: "user", content: prompt};
+        const m: ChatCompletionMessageParam = {role: "user", content: prompt};
         setGenerating(true);
         const response = await openai.chat.completions.create({
-            messages: [{ role: 'user', content: 'Say this is a test' }],
+            messages: [...history, m],
             model: 'gpt-3.5-turbo',
           });
         setPrompt("");
         setTextareaCount(0);
-        setHistory([...history, m, {role: 'system', content: response.data.choices[0].message.content}]);
+        setHistory([...history, m, response.choices[0].message]);
         setGenerating(false);
     }
 
@@ -40,7 +37,7 @@ function App() {
                     {history.map(h => {
                         if (h.role == 'system')
                             return;
-                        return <p>{h.role}: {h.content}</p>
+                        return <p>{h.role == "user" ? "Jij" : "Keuken Assistent"}: {h.content?.toString()}</p>
                     })}
                 </div>
                 <div className="textarea-wrapper">
