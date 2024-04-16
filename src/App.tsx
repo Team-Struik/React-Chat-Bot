@@ -16,7 +16,7 @@ function App() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [purchasedItems, setPurchasedItems] = useState<any>([]);
 
-  const [isImageExpanded, setIsImageExpanded] = useState<boolean>(false);  
+  const [isImageExpanded, setIsImageExpanded] = useState<boolean>(false);
 
   const maxTokens = 250;
 
@@ -59,7 +59,7 @@ function App() {
         console.log("Chat is completed");
         setPrompt("");
         setTextareaCount(0);
-        setHistory([...history, m, response.choices[0].message]);
+        setHistory([...history, m]);
         setGenerating(true);
         const finalResponse = await openai.chat.completions.create({
             messages: [...history, { role: "user", content: "Geef een JSON-overzicht van de gekochte items, de quantity en de prijs en totale prijs" }],
@@ -75,7 +75,7 @@ function App() {
               console.error("Error parsing JSON:", error);
             }
           }
-    
+
         return;
     }
 
@@ -190,6 +190,25 @@ Als het gesprek afgelopen is, stuur je een AFSLUITINGSBERICHT.
 In dit bericht Vraag je of het gesprek afgerond is, en als het afgerond is. Reageer dan met een json bericht met de volgende structuur:
 {
   "status": "completed"
+}
+
+Een voorbeeld van een json bericht na het afronden van het gesprek is:
+{
+    "items": [
+        {
+            "name": "Quartz Countertops",
+            "quantity": "2 square meters",
+            "price": "€200"
+            "total_price": "€400"
+        },
+        {
+            "name": "Backsplash installation",
+            "quantity": "2 linear meters",
+            "price": "€60"
+            "total_price": "€120"
+        }
+    ],
+    "total_price": "€520"
 }
 `;
   return header;
