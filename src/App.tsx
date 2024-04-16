@@ -47,7 +47,7 @@ function App() {
     } else {
       response = await openai.chat.completions.create({
         messages: [...history, m],
-        model: 'gpt-4-turbo',
+        model: 'gpt-3.5-turbo',
       });
     }
 
@@ -61,9 +61,10 @@ function App() {
         setTextareaCount(0);
         setHistory([...history, m]);
         setGenerating(true);
+        console.log(history)
         const finalResponse = await openai.chat.completions.create({
             messages: [...history, 
-            { role: "system", content: "Het gesprek is afgelopen, het volgende bericht komt van intern. reageer alleen met een json" },
+            { role: "assistant", content: "{ \"status\": \"completed\" }"},
             { role: "user", content: `Een voorbeeld van een json bericht na het afronden van het gesprek is:
             reageer ALLEEN met een json bericht met de volgende structuur NIKS ANDERS
             {
@@ -83,7 +84,7 @@ function App() {
                 ],
                 "total_price": "€520"
             }`}],
-            model: 'gpt-4-turbo',
+            model: 'gpt-3.5-turbo',
         });
 
           if (finalResponse.choices[0].message.content) {
