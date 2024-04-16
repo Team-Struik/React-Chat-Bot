@@ -1,9 +1,17 @@
+
 /* General Styles */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: #0f0f0f;
   color: #d1d1d1;
-  overflow: hidden; /* Prevent scrollbars on body */
+  overflow-y: scroll; 
+  overflow-x: hidden; 
+  -ms-overflow-style: none; 
+  scrollbar-width: 0px; 
+}
+
+body::-webkit-scrollbar {
+  display: none;
 }
 
 /* Heading */

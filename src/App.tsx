@@ -14,7 +14,9 @@ function App() {
   const [prompt, setPrompt] = useState<string>("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [isImageExpanded, setIsImageExpanded] = useState<boolean>(false);
+  const [purchasedItems, setPurchasedItems] = useState<any>([]);
+
+  const [isImageExpanded, setIsImageExpanded] = useState<boolean>(false);  
 
   const maxTokens = 250;
 
@@ -49,6 +51,31 @@ function App() {
       });
     }
 
+    if (!response.choices[0].message.content) {
+      return;
+    }
+
+    if (response.choices[0].message.content.includes("completed")) {
+        console.log("Chat is completed");
+
+        const finalResponse = await openai.chat.completions.create({
+            messages: [...history, { role: "user", content: "Geef een JSON-overzicht van de gekochte items, de quantity en de prijs en totale prijs" }],
+            model: 'gpt-4-turbo',
+          });
+
+          if (finalResponse.choices[0].message.content) {
+            try {
+              const purchasedItemsJson = JSON.parse(finalResponse.choices[0].message.content);
+              setPurchasedItems(purchasedItemsJson);
+              console.log("Purchased items:", purchasedItemsJson);
+            } catch (error) {
+              console.error("Error parsing JSON:", error);
+            }
+          }
+    
+        return;
+    }
+
     setPrompt("");
     setTextareaCount(0);
     setHistory([...history, m, response.choices[0].message]);
@@ -73,7 +100,7 @@ function App() {
     });
   };
 
-   return (
+  return (
     <>
       <h1>AI Chat Bot</h1>
       <div className="chat">
@@ -121,7 +148,11 @@ function App() {
               onChange={handleImageChange}
               style={{ display: "none" }}
             />
-            <button disabled={generating} type="submit" onClick={handleSubmit}>
+            <button
+              disabled={generating || prompt.trim() === ""}
+              type="submit"
+              onClick={handleSubmit}
+            >
               Submit
             </button>
           </div>
@@ -148,6 +179,13 @@ Measuring and surveying: €200 per visit
 Edge finishing (e.g. beveled, rounded): €50 per linear meter
 Cutout for undermount sink: €100 per piece
 Installation: €200 per meter
+
+
+Als het gesprek afgelopen is, stuur je een AFSLUITINGSBERICHT.
+In dit bericht Vraag je of het gesprek afgerond is, en als het afgerond is. Reageer dan met een json bericht met de volgende structuur:
+{
+  "status": "completed"
+}
 `;
   return header;
 };
