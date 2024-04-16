@@ -47,7 +47,7 @@ function App() {
     } else {
       response = await openai.chat.completions.create({
         messages: [...history, m],
-        model: 'gpt-3.5-turbo',
+        model: 'gpt-4-turbo',
       });
     }
 
@@ -61,41 +61,82 @@ function App() {
         setTextareaCount(0);
         setHistory([...history, m]);
         setGenerating(true);
-        const finalResponse = await openai.chat.completions.create({
-            messages: [...history,
-            response.choices[0].message,
-            { role: "user", content: `Een voorbeeld van een json bericht na het afronden van het gesprek is:
-            reageer ALLEEN met een json bericht met de volgende structuur NIKS ANDERS
-            {
-                "items": [
-                {
-                    "name": "Quartz Countertops",
-                    "quantity": "2 vierkante meters",
-                    "price": "€200",
-                    "total_price": "€400"
-                },
-                {
-                    "name": "Backsplash installation",
-                    "quantity": "2 lineaire meters",
-                    "price": "€60",
-                    "total_price": "€120"
-                }
-                ],
-                "total_price": "€520"
-            }`}],
-            model: 'gpt-3.5-turbo',
+        let tempHistory: ChatCompletionMessageParam[] = [...history, response.choices[0].message, {role: "user", content: `Een voorbeeld van een json bericht na het afronden van het gesprek is:
+reageer ALLEEN met een json bericht met de volgende structuur NIKS ANDERS
+{
+    "items": [
+    {
+        "name": "Quartz Countertops",
+        "quantity": "2 vierkante meters",
+        "price": "€200",
+        "total_price": "€400"
+    },
+    {
+        "name": "Backsplash installation",
+        "quantity": "2 lineaire meters",
+        "price": "€60",
+        "total_price": "€120"
+    }
+    ],
+    "total_price": "€520"
+}`}];
+        let finalResponse = await openai.chat.completions.create({
+            messages: tempHistory,
+            model: 'gpt-4-turbo',
         });
+        let total_tries = 4;
 
+        for (let i = 0; i < total_tries; i++) {
           if (finalResponse.choices[0].message.content) {
-            try {
-              const purchasedItemsJson = JSON.parse(finalResponse.choices[0].message.content);
-              setPurchasedItems(purchasedItemsJson);
-              console.log("Purchased items:", purchasedItemsJson);
-            } catch (error) {
-              console.error("Error parsing JSON:", error);
+              try {
+                const purchasedItemsJson = JSON.parse(finalResponse.choices[0].message.content);
+                if (purchasedItemsJson.items && purchasedItemsJson.total_price) {
+                  setPurchasedItems(purchasedItemsJson.items);
+                  console.log("Purchased Items:", purchasedItemsJson.items);
+                  return;
+                }
+
+                tempHistory = [...tempHistory, finalResponse.choices[0].message, { role: "user", content: `Fout format van JSON, Verwacht:
+{
+  "items": [
+  {
+      "name": "Quartz Countertops",
+      "quantity": "2 vierkante meters",
+      "price": "€200",
+      "total_price": "€400"
+  },
+  {
+      "name": "Backsplash installation",
+      "quantity": "2 lineaire meters",
+      "price": "€60",
+      "total_price": "€120"
+  }
+  ],
+  "total_price": "€520"
+} Gekregen:
+                ${finalResponse.choices[0].message.content}`}];
+                finalResponse = await openai.chat.completions.create({
+                  messages: tempHistory,
+                  model: 'gpt-4-turbo',
+                });
+
+              } catch (error) {
+                console.error("Error parsing JSON:", error);
+                tempHistory = [...tempHistory, { role: "user", content: `Sorry, het systeem kon de JSON niet parsen ${error}` }];
+                finalResponse = await openai.chat.completions.create({
+                  messages: tempHistory,
+                  model: 'gpt-4-turbo',
+                });
+              }
+            }
+
+            if (i === total_tries - 1) {
+              console.log(tempHistory);
+              console.log(finalResponse.choices[0].message.content);
+              console.error("Failed to get JSON response");
+              setHistory([...history, { role: "assistant", content: "Failed to get JSON response" }]);
             }
           }
-
         return;
     }
 
@@ -210,6 +251,25 @@ Als het gesprek afgelopen is, stuur je een AFSLUITINGSBERICHT.
 In dit bericht Vraag je of het gesprek afgerond is, en als het afgerond is. Reageer dan met een json bericht met de volgende structuur:
 {
   "status": "completed"
+}
+
+Wanneer het gesprek is afgerond en het afsluitingsbericht is gestuurd, reageer je met een json bericht met de volgende structuur:
+{
+  "items": [
+  {
+      "name": "Quartz Countertops",
+      "quantity": "2 vierkante meters",
+      "price": "€200",
+      "total_price": "€400"
+  },
+  {
+      "name": "Backsplash installation",
+      "quantity": "2 lineaire meters",
+      "price": "€60",
+      "total_price": "€120"
+  }
+  ],
+  "total_price": "€520"
 }
 `;
   return header;
