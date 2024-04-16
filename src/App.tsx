@@ -1,83 +1,155 @@
-import { useState } from "react"
+import { useState, useRef } from "react";
 import OpenAI from 'openai';
 import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
-import { OPENAI_KEY } from "../keys.json"
+import { OPENAI_KEY } from "../keys.json";
 
-
-const openai = new OpenAI({
-    apiKey: OPENAI_KEY,
-    dangerouslyAllowBrowser: true
-});
+const openai = new OpenAI({ apiKey: OPENAI_KEY, dangerouslyAllowBrowser: true });
 
 function App() {
-    const [history, setHistory] = useState<ChatCompletionMessageParam[]>([{role: 'system', content: createSystemPrompt()}]);
-    const [generating, setGenerating] = useState<boolean>(false);
-    const [textareaCount, setTextareaCount] = useState<number>(0);
-    const [prompt, setPrompt] = useState<string>("");
-    const maxTokens = 250;
+  const [history, setHistory] = useState<ChatCompletionMessageParam[]>([
+    { role: 'system', content: createSystemPrompt() },
+  ]);
+  const [generating, setGenerating] = useState<boolean>(false);
+  const [textareaCount, setTextareaCount] = useState<number>(0);
+  const [prompt, setPrompt] = useState<string>("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isImageExpanded, setIsImageExpanded] = useState<boolean>(false);
 
-    const handleSubmit = async () => {
-        const m: ChatCompletionMessageParam = {role: "user", content: prompt};
-        setGenerating(true);
-        const response = await openai.chat.completions.create({
-            messages: [...history, m],
-            model: 'gpt-3.5-turbo',
-          });
-        setPrompt("");
-        setTextareaCount(0);
-        setHistory([...history, m, response.choices[0].message]);
-        setGenerating(false);
+  const maxTokens = 250;
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const file = e.target.files[0];
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleImageClick = () => {
+    setIsImageExpanded(!isImageExpanded);
+  };
+
+  const handleSubmit = async () => {
+    const m: ChatCompletionMessageParam = { role: "user", content: prompt };
+    setGenerating(true);
+
+    let response;
+    if (imageFile) {
+      const base64Image = await encodeImage(imageFile);
+      response = await openai.chat.completions.create({
+        messages: [...history, m, { role: "user", content: [{ type: "text", text: "What's in this image?" }, { type: "image_url", image_url: { url: `data:image/jpeg;base64,${base64Image}` } }] }],
+        model: 'gpt-4-turbo',
+      });
+      setImageFile(null);
+    } else {
+      response = await openai.chat.completions.create({
+        messages: [...history, m],
+        model: 'gpt-4-turbo',
+      });
     }
 
-    return (
-        <>
-            <h1>AI Chat Bot</h1>
-            <div className="chat">
-                <div className="chat-history">
-                    {history.map(h => {
-                        if (h.role == 'system')
-                            return;
-                        return <p>{h.role == "user" ? "Jij" : "Keuken Assistent"}: {h.content?.toString()}</p>
-                    })}
-                </div>
-                <div className="textarea-wrapper">
-                    <div className="above-input">
-                        <p>{textareaCount}/{maxTokens}</p>
-                    </div>
-                    <div className="textarea-container">
-                        <textarea 
-                            disabled={generating}
-                            maxLength={maxTokens}
-                            value={prompt}
-                            onChange={e => {setTextareaCount(e.target.value.length); setPrompt(e.target.value);}}/>
-                        <button disabled={generating} type="submit" onClick={handleSubmit}>Submit</button>
-                    </div>
-                </div>
-            </div>
+    setPrompt("");
+    setTextareaCount(0);
+    setHistory([...history, m, response.choices[0].message]);
+    setGenerating(false);
+  };
 
-        </>
-    )
+  const encodeImage = async (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64 = reader.result?.toString().split(',')[1];
+        if (typeof base64 === 'string') {
+          resolve(base64);
+        } else {
+          reject('Failed to encode image');
+        }
+      };
+      reader.onerror = (error) => {
+        reject(error);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+   return (
+    <>
+      <h1>AI Chat Bot</h1>
+      <div className="chat">
+        <div className="chat-history">
+          {history.map((h, i) => {
+            if (h.role == 'system') return null;
+            return <p key={i}>{h.role == "user" ? "You" : "Kitchen Assistant"}: {h.content?.toString()}</p>;
+          })}
+        </div>
+        <div className="textarea-wrapper">
+          <div className="above-input">
+            <p>{textareaCount}/{maxTokens}</p>
+          </div>
+          <div className="textarea-container">
+            {imagePreview && (
+              <div className="image-preview" onClick={handleImageClick}>
+                <img
+                  src={imagePreview}
+                  alt="Image Preview"
+                  style={{
+                    width: isImageExpanded ? '300px' : '50px',
+                    height: isImageExpanded ? '300px' : '50px',
+                    objectFit: 'contain',
+                    cursor: 'pointer',
+                  }}
+                />
+              </div>
+            )}
+            <textarea
+              disabled={generating}
+              maxLength={maxTokens}
+              value={prompt}
+              onChange={(e) => {
+                setTextareaCount(e.target.value.length);
+                setPrompt(e.target.value);
+              }}
+            />
+            <label htmlFor="image-upload" className="image-upload-label">
+              {imageFile ? imageFile.name : "Upload Image"}
+            </label>
+            <input
+              id="image-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              style={{ display: "none" }}
+            />
+            <button disabled={generating} type="submit" onClick={handleSubmit}>
+              Submit
+            </button>
+          </div>
+        </div>
+      </div>
+    </>
+  );
 }
 
 const createSystemPrompt = () => {
-    let header = `
-Reageer altijd in het nederlands.
-Jij bent een online chat bot voor een Keukentafel maker. Jij helpt de klant met het vinden van het beste product.
-Reageer alleen op relevante vragen, alles wat er niet mee te maken heeft moet je negeren.
-Als er spraken is van opsomming van de prijzen, geef een duidelijk overzicht over welke getallen het gaat.
-Dit zijn de producten:
-1. Kwartsen Werkbladen: Prijs: €200 per vierkante meter
-2. Granieten Werkbladen: Prijs: €250 per vierkante meter
+  let header = `
+Respond in Dutch always.
+You are an online chat bot for a kitchen table maker. You help the customer find the best product.
+Only respond to relevant questions, ignore anything that is not related.
+If there is a list of prices, provide a clear overview of which numbers are referring to.
+These are the products:
+1. Quartz Countertops: Price: €200 per square meter
+2. Granite Countertops: Price: €250 per square meter
 
-Extra items:
-Aanbrengen van sealer: €20 per vierkante meter
-Achterwand installatie: €60 per strekkende meter
-Inmeten en opmeten: €200 per bezoek
-Randafwerking (bijv. afgeschuind, afgerond): €50 per strekkende meter
-Uitsparing voor onderbouw spoelbak: €100 per stuk
-Installatie: €200 per meter
-`
-    return header;
-}
+Additional items:
+Applying sealer: €20 per square meter
+Backsplash installation: €60 per linear meter
+Measuring and surveying: €200 per visit
+Edge finishing (e.g. beveled, rounded): €50 per linear meter
+Cutout for undermount sink: €100 per piece
+Installation: €200 per meter
+`;
+  return header;
+};
 
-export default App
+export default App;
