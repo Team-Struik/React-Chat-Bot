@@ -61,10 +61,9 @@ function App() {
         setTextareaCount(0);
         setHistory([...history, m]);
         setGenerating(true);
-        console.log(history)
         const finalResponse = await openai.chat.completions.create({
-            messages: [...history, 
-            { role: "assistant", content: "{ \"status\": \"completed\" }"},
+            messages: [...history,
+            response.choices[0].message,
             { role: "user", content: `Een voorbeeld van een json bericht na het afronden van het gesprek is:
             reageer ALLEEN met een json bericht met de volgende structuur NIKS ANDERS
             {
