@@ -40,7 +40,7 @@ function App() {
     if (imageFile) {
       const base64Image = await encodeImage(imageFile);
       response = await openai.chat.completions.create({
-        messages: [...history, m, { role: "user", content: [{ type: "text", text: "What's in this image?" }, { type: "image_url", image_url: { url: `data:image/jpeg;base64,${base64Image}` } }] }],
+        messages: [...history, m, { role: "user", content: [{ type: "text", text: prompt }, { type: "image_url", image_url: { url: `data:image/jpeg;base64,${base64Image}` } }] }],
         model: 'gpt-4-turbo',
       });
       setImageFile(null);
@@ -57,7 +57,10 @@ function App() {
 
     if (response.choices[0].message.content.includes("completed")) {
         console.log("Chat is completed");
-
+        setPrompt("");
+        setTextareaCount(0);
+        setHistory([...history, m, response.choices[0].message]);
+        setGenerating(true);
         const finalResponse = await openai.chat.completions.create({
             messages: [...history, { role: "user", content: "Geef een JSON-overzicht van de gekochte items, de quantity en de prijs en totale prijs" }],
             model: 'gpt-4-turbo',
@@ -179,6 +182,8 @@ Measuring and surveying: €200 per visit
 Edge finishing (e.g. beveled, rounded): €50 per linear meter
 Cutout for undermount sink: €100 per piece
 Installation: €200 per meter
+
+Formateer je text in normale zinnen, en gebruik alleen newlines als het nodig is.
 
 
 Als het gesprek afgelopen is, stuur je een AFSLUITINGSBERICHT.
