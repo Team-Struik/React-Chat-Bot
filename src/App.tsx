@@ -62,9 +62,29 @@ function App() {
         setHistory([...history, m]);
         setGenerating(true);
         const finalResponse = await openai.chat.completions.create({
-            messages: [...history, { role: "user", content: "Geef een JSON-overzicht van de gekochte items, de quantity en de prijs en totale prijs" }],
+            messages: [...history, 
+            { role: "system", content: "Het gesprek is afgelopen, het volgende bericht komt van intern. reageer alleen met een json" },
+            { role: "user", content: `Een voorbeeld van een json bericht na het afronden van het gesprek is:
+            reageer ALLEEN met een json bericht met de volgende structuur NIKS ANDERS
+            {
+                "items": [
+                {
+                    "name": "Quartz Countertops",
+                    "quantity": "2 vierkante meters",
+                    "price": "€200",
+                    "total_price": "€400"
+                },
+                {
+                    "name": "Backsplash installation",
+                    "quantity": "2 lineaire meters",
+                    "price": "€60",
+                    "total_price": "€120"
+                }
+                ],
+                "total_price": "€520"
+            }`}],
             model: 'gpt-4-turbo',
-          });
+        });
 
           if (finalResponse.choices[0].message.content) {
             try {
@@ -190,25 +210,6 @@ Als het gesprek afgelopen is, stuur je een AFSLUITINGSBERICHT.
 In dit bericht Vraag je of het gesprek afgerond is, en als het afgerond is. Reageer dan met een json bericht met de volgende structuur:
 {
   "status": "completed"
-}
-
-Een voorbeeld van een json bericht na het afronden van het gesprek is:
-{
-    "items": [
-        {
-            "name": "Quartz Countertops",
-            "quantity": "2 vierkante meters",
-            "price": "€200"
-            "total_price": "€400"
-        },
-        {
-            "name": "Backsplash installation",
-            "quantity": "2 lineaire meters",
-            "price": "€60"
-            "total_price": "€120"
-        }
-    ],
-    "total_price": "€520"
 }
 `;
   return header;
