@@ -197,13 +197,13 @@ Een voorbeeld van een json bericht na het afronden van het gesprek is:
     "items": [
         {
             "name": "Quartz Countertops",
-            "quantity": "2 square meters",
+            "quantity": "2 vierkante meters",
             "price": "€200"
             "total_price": "€400"
         },
         {
             "name": "Backsplash installation",
-            "quantity": "2 linear meters",
+            "quantity": "2 lineaire meters",
             "price": "€60"
             "total_price": "€120"
         }
