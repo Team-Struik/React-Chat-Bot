@@ -64,22 +64,27 @@ function App() {
       let tempHistory: ChatCompletionMessageParam[] = [...history, response.choices[0].message, {
         role: "user", content: `Een voorbeeld van een json bericht na het afronden van het gesprek is:
 reageer ALLEEN met een json bericht met de volgende structuur NIKS ANDERS
+Laat de additional_info LEEG met een LEGE STRING als er geen extra info is. vul daar alleen iets in als het ABSOLUUT nodig is
+bijvoorbeeld een kleur, of extra service.
 {
     "items": [
-    {
-        "name": "Quartz Countertops",
-        "quantity": "2 vierkante meters",
-        "price": "€200",
-        "total_price": "€400"
-    },
-    {
-        "name": "Backsplash installation",
-        "quantity": "2 lineaire meters",
-        "price": "€60",
-        "total_price": "€120"
-    }
-    ],
-    "total_price": "€520"
+      {
+          "name": "Quartz Countertops",
+          "quantity": "2 vierkante meters",
+          "price": "€200",
+          "total_price": "€400"
+          "additional_info": "extra info about the product"
+      },
+      {
+          "name": "Backsplash installation",
+          "quantity": "2 lineaire meters",
+          "price": "€60",
+          "total_price": "€120"
+          "additional_info": "extra info about installation"
+      }
+      ],
+      "total_price": "€520"
+      "additional_info": "extra info about full order"
 }`}];
       let finalResponse = await openai.chat.completions.create({
         messages: tempHistory,
@@ -99,7 +104,12 @@ reageer ALLEEN met een json bericht met de volgende structuur NIKS ANDERS
             }
 
             tempHistory = [...tempHistory, finalResponse.choices[0].message, {
-              role: "user", content: `Fout format van JSON, Verwacht:
+              role: "user", content: `
+              Laat de additional_info LEEG met een LEGE STRING als er geen extra info is. vul daar alleen iets in als het ABSOLUUT nodig is
+bijvoorbeeld een kleur, of extra service.
+
+              Fout format van JSON, Verwacht:
+              
 {
   "items": [
   {
@@ -107,15 +117,18 @@ reageer ALLEEN met een json bericht met de volgende structuur NIKS ANDERS
       "quantity": "2 vierkante meters",
       "price": "€200",
       "total_price": "€400"
+      "additional_info": "extra info about the product"
   },
   {
       "name": "Backsplash installation",
       "quantity": "2 lineaire meters",
       "price": "€60",
       "total_price": "€120"
+      "additional_info": "extra info about installation"
   }
   ],
   "total_price": "€520"
+  "additional_info": "extra info about full order"
 } Gekregen:
                 ${finalResponse.choices[0].message.content}`
             }];
@@ -258,6 +271,8 @@ In dit bericht Vraag je of het gesprek afgerond is, en als het afgerond is. Reag
 }
 
 Wanneer het gesprek is afgerond en het afsluitingsbericht is gestuurd, reageer je met een json bericht met de volgende structuur:
+Laat de additional_info LEEG met een LEGE STRING als er geen extra info is. vul daar alleen iets in als het ABSOLUUT nodig is
+bijvoorbeeld een kleur, of extra service.
 {
   "items": [
   {
@@ -265,15 +280,18 @@ Wanneer het gesprek is afgerond en het afsluitingsbericht is gestuurd, reageer j
       "quantity": "2 vierkante meters",
       "price": "€200",
       "total_price": "€400"
+      "additional_info": "extra info about the product"
   },
   {
       "name": "Backsplash installation",
       "quantity": "2 lineaire meters",
       "price": "€60",
       "total_price": "€120"
+      "additional_info": "extra info about installation"
   }
   ],
   "total_price": "€520"
+  "additional_info": "extra info about full order"
 }
 `;
   return header;
