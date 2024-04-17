@@ -56,12 +56,13 @@ function App() {
     }
 
     if (response.choices[0].message.content.includes("completed")) {
-        console.log("Chat is completed");
-        setPrompt("");
-        setTextareaCount(0);
-        setHistory([...history, m]);
-        setGenerating(true);
-        let tempHistory: ChatCompletionMessageParam[] = [...history, response.choices[0].message, {role: "user", content: `Een voorbeeld van een json bericht na het afronden van het gesprek is:
+      console.log("Chat is completed");
+      setPrompt("");
+      setTextareaCount(0);
+      setHistory([...history, m]);
+      setGenerating(true);
+      let tempHistory: ChatCompletionMessageParam[] = [...history, response.choices[0].message, {
+        role: "user", content: `Een voorbeeld van een json bericht na het afronden van het gesprek is:
 reageer ALLEEN met een json bericht met de volgende structuur NIKS ANDERS
 {
     "items": [
@@ -80,23 +81,25 @@ reageer ALLEEN met een json bericht met de volgende structuur NIKS ANDERS
     ],
     "total_price": "€520"
 }`}];
-        let finalResponse = await openai.chat.completions.create({
-            messages: tempHistory,
-            model: 'gpt-4-turbo',
-        });
-        let total_tries = 4;
+      let finalResponse = await openai.chat.completions.create({
+        messages: tempHistory,
+        model: 'gpt-4-turbo',
+      });
+      let total_tries = 4;
 
-        for (let i = 0; i < total_tries; i++) {
-          if (finalResponse.choices[0].message.content) {
-              try {
-                const purchasedItemsJson = JSON.parse(finalResponse.choices[0].message.content);
-                if (purchasedItemsJson.items && purchasedItemsJson.total_price) {
-                  setPurchasedItems(purchasedItemsJson.items);
-                  console.log("Purchased Items:", purchasedItemsJson.items);
-                  return;
-                }
+      for (let i = 0; i < total_tries; i++) {
+        if (finalResponse.choices[0].message.content) {
+          try {
+            const purchasedItemsJson = JSON.parse(finalResponse.choices[0].message.content);
+            if (purchasedItemsJson.items && purchasedItemsJson.total_price) {
+              setPurchasedItems(purchasedItemsJson);
+              console.log("Purchased Items:", purchasedItemsJson);
+              // alert("Purchased Items: " + JSON.stringify(purchasedItemsJson, null, 2));
+              return;
+            }
 
-                tempHistory = [...tempHistory, finalResponse.choices[0].message, { role: "user", content: `Fout format van JSON, Verwacht:
+            tempHistory = [...tempHistory, finalResponse.choices[0].message, {
+              role: "user", content: `Fout format van JSON, Verwacht:
 {
   "items": [
   {
@@ -114,30 +117,31 @@ reageer ALLEEN met een json bericht met de volgende structuur NIKS ANDERS
   ],
   "total_price": "€520"
 } Gekregen:
-                ${finalResponse.choices[0].message.content}`}];
-                finalResponse = await openai.chat.completions.create({
-                  messages: tempHistory,
-                  model: 'gpt-4-turbo',
-                });
+                ${finalResponse.choices[0].message.content}`
+            }];
+            finalResponse = await openai.chat.completions.create({
+              messages: tempHistory,
+              model: 'gpt-4-turbo',
+            });
 
-              } catch (error) {
-                console.error("Error parsing JSON:", error);
-                tempHistory = [...tempHistory, { role: "user", content: `Sorry, het systeem kon de JSON niet parsen ${error}` }];
-                finalResponse = await openai.chat.completions.create({
-                  messages: tempHistory,
-                  model: 'gpt-4-turbo',
-                });
-              }
-            }
-
-            if (i === total_tries - 1) {
-              console.log(tempHistory);
-              console.log(finalResponse.choices[0].message.content);
-              console.error("Failed to get JSON response");
-              setHistory([...history, { role: "assistant", content: "Failed to get JSON response" }]);
-            }
+          } catch (error) {
+            console.error("Error parsing JSON:", error);
+            tempHistory = [...tempHistory, { role: "user", content: `Sorry, het systeem kon de JSON niet parsen ${error}` }];
+            finalResponse = await openai.chat.completions.create({
+              messages: tempHistory,
+              model: 'gpt-4-turbo',
+            });
           }
-        return;
+        }
+
+        if (i === total_tries - 1) {
+          console.log(tempHistory);
+          console.log(finalResponse.choices[0].message.content);
+          console.error("Failed to get JSON response");
+          setHistory([...history, { role: "assistant", content: "Failed to get JSON response" }]);
+        }
+      }
+      return;
     }
 
     setPrompt("");
