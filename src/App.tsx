@@ -2,6 +2,8 @@ import { useState } from "react";
 import OpenAI from "openai";
 import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 import { OPENAI_KEY } from "../keys.json";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import InvoicePDF from "./InvoicePDF"
 
 const openai = new OpenAI({
   apiKey: OPENAI_KEY,
@@ -17,7 +19,7 @@ function App() {
   const [prompt, setPrompt] = useState<string>("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [purchasedItems, setPurchasedItems] = useState<any>([]);
+  const [purchasedItems, setPurchasedItems] = useState<any>({});
 
   const [isImageExpanded, setIsImageExpanded] = useState<boolean>(false);
 
@@ -92,9 +94,9 @@ bijvoorbeeld een kleur, of extra service.
     "items": [
       {
           "name": "Quartz Countertops",
-          "quantity": "2 vierkante meters",
+          "quantity": "8 vierkante meters",
           "price": "€200",
-          "total_price": "€400"
+          "total_price": "€1.600"
           "additional_info": "extra info about the product"
       },
       {
@@ -105,7 +107,7 @@ bijvoorbeeld een kleur, of extra service.
           "additional_info": "extra info about installation"
       }
       ],
-      "total_price": "€520"
+      "total_price": "€1.720"
       "additional_info": "extra info about full order"
 }`,
         },
@@ -127,7 +129,7 @@ bijvoorbeeld een kleur, of extra service.
               purchasedItemsJson.total_price
             ) {
               setPurchasedItems(purchasedItemsJson);
-              console.log("Purchased Items:", purchasedItemsJson);
+              console.log(finalResponse.choices[0].message.content);
               return;
             }
 
@@ -146,9 +148,9 @@ bijvoorbeeld een kleur, of extra service.
   "items": [
   {
       "name": "Quartz Countertops",
-      "quantity": "2 vierkante meters",
+      "quantity": "8 vierkante meters",
       "price": "€200",
-      "total_price": "€400"
+      "total_price": "€1.600"
       "additional_info": "extra info about the product"
   },
   {
@@ -159,7 +161,7 @@ bijvoorbeeld een kleur, of extra service.
       "additional_info": "extra info about installation"
   }
   ],
-  "total_price": "€520"
+  "total_price": "€1.720"
   "additional_info": "extra info about full order"
 } Gekregen:
                 ${finalResponse.choices[0].message.content}`,
@@ -228,8 +230,7 @@ bijvoorbeeld een kleur, of extra service.
   return (
     <>
       <h1 className="bliss">
-        <span>Blis</span>
-        <span className="text-outline">Digital</span>
+        <img src="/blis.svg" alt="Blis Logo" />
       </h1>
       <div className="main-page">
         <div className="chat">
@@ -247,9 +248,15 @@ bijvoorbeeld een kleur, of extra service.
                 </div>
               );
             })}
+            {purchasedItems.items &&
+              <PDFDownloadLink className="download-link" document={<InvoicePDF invoiceData={purchasedItems} />} fileName="invoice.pdf">
+                  {({ blob, url, loading, error }) =>
+                      loading ? 'Loading document...' : 'Download Invoice'
+                  }
+              </PDFDownloadLink>}
           </div>
           <div className="textarea-wrapper">
-            <div className="above-input">
+            <div className="word-count">
               <p>
                 {textareaCount}/{maxTokens}
               </p>
@@ -287,7 +294,6 @@ bijvoorbeeld een kleur, of extra service.
               />
               <label
                 htmlFor="image-upload"
-                className="image-upload-label"
               >
                 {imageFile ? imageFile.name : "Upload Image"}
               </label>
@@ -315,41 +321,35 @@ bijvoorbeeld een kleur, of extra service.
 
 const createSystemPrompt = () => {
   let header = `
-Respond in Dutch always.
-You are an online chat bot for a kitchen table maker. You help the customer find the best product.
-Only respond to relevant questions, ignore anything that is not related.
-If there is a list of prices, provide a clear overview of which numbers are referring to.
-These are the products:
-1. Quartz Countertops: Price: €200 per square meter
-2. Granite Countertops: Price: €250 per square meter
-
-Additional items:
-Applying sealer: €20 per square meter
-Backsplash installation: €60 per linear meter
-Measuring and surveying: €200 per visit
-Edge finishing (e.g. beveled, rounded): €50 per linear meter
-Cutout for undermount sink: €100 per piece
-Installation: €200 per meter
+Reageer altijd in het Nederlands.
+Jij bent een online chatbot voor een keukentafel maker. Jij helpt de klant met het vinden van het beste product.
+Reageer alleen op relevante vragen, negeer alles wat niet relevant is.
+Als er een lijst met prijzen is, geef dan een duidelijk overzicht van welke nummers waar naar verwijzen.
+Dit is de CSV data van de keukentafel maker:
+Materiaalsoort;Spatrand;Vensterbank;Boorgaten_per_stuk_mogelijk;WCD_mogelijk;Randafwerking_mogelijk;Prijs_per_m2;Randafwerking_pm;Spatrand_pm;Vensterbank_pm;Uitsparing_onderbouw;Uitsparing_inleg;Uitsparing_ruw;Kraangat;Zeepdispenser;Boorgaten_per_stuk;WCD;Achterwand_pm;Randafwerking_pm_optie2;
+Noble Desiree Grey Matt;0-150 mm;150 mm+;true;true;false;247.52;87.00;35.00;309.40;151.50;97.50;70.00;10.70;10.70;5.00;13.50;309.40;28.00;
+Noble Carrara Verzoet;150 mm+;0-150 mm;true;true;true;258.40;87.00;309.40;35.00;151.50;97.50;70.00;10.70;10.70;5.00;13.50;315.60;28.00;
+Taurus Terazzo White Verzoet;0-150 mm;0-150 mm;false;false;true;239.40;79.00;35.00;35.00;151.50;97.50;70.00;10.70;10.70;5.00;13.50;298.50;28.00;
+Taurus Terazzo Black;150 mm+;150 mm+;true;true;true;228.50;79.00;309.40;309.40;151.50;97.50;70.00;10.70;10.70;5.00;13.50;289.50;28.00;
+Glencoe Verzoet;"0-150; 150 mm+";150 mm+;false;false;true;305.50;95.00;"40; 350";340.50;151.50;97.50;70.00;10.70;10.70;5.00;13.50;315.60;28.00;
 
 Formateer je text in normale zinnen, en gebruik alleen newlines als het nodig is.
+Erg is geen mogenlijkheid voor markdown, dus gebruik geen markdown of andere styling opties.
 
-
-Als het gesprek afgelopen is, stuur je een AFSLUITINGSBERICHT.
+Als het gesprek afgelopen is, stuur je een AFSLUITINGS JSON bericht.
 In dit bericht Vraag je of het gesprek afgerond is, en als het afgerond is. Reageer dan met een json bericht met de volgende structuur:
 {
   "status": "completed"
 }
-
-Wanneer het gesprek is afgerond en het afsluitingsbericht is gestuurd, reageer je met een json bericht met de volgende structuur:
-Laat de additional_info LEEG met een LEGE STRING als er geen extra info is. vul daar alleen iets in als het ABSOLUUT nodig is
-bijvoorbeeld een kleur, of extra service.
+DIT IS HET AFSLUITINGS JSON.
+Alleen wanner het gesprek is afgerond, en het AFSLUITINGS JSON is gestuurd, reageer je met een json bericht met de volgende structuur:
 {
   "items": [
   {
       "name": "Quartz Countertops",
-      "quantity": "2 vierkante meters",
+      "quantity": "8 vierkante meters",
       "price": "€200",
-      "total_price": "€400"
+      "total_price": "€1.600"
       "additional_info": "extra info about the product"
   },
   {
@@ -360,9 +360,12 @@ bijvoorbeeld een kleur, of extra service.
       "additional_info": "extra info about installation"
   }
   ],
-  "total_price": "€520"
+  "total_price": "€1.720"
   "additional_info": "extra info about full order"
 }
+Laat de additional_info LEEG met een LEGE STRING als er geen extra info is. vul daar alleen iets in als het ABSOLUUT nodig is
+bijvoorbeeld een kleur, of extra service.
+Als het AFSLUITINGS JSON nog niet is gestuurd, stuur dat bericht dan eerst.
 `;
   return header;
 };

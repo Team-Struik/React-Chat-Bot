@@ -14,25 +14,22 @@
     --primary-foreground: hsl(26 83.3% 14.1%);
     --secondary: hsl(12 6.5% 15.1%);
     --secondary-foreground: hsl(60 9.1% 97.8%);
-    --muted: hsl(12 6.5% 15.1%);
+    --muted: hsl(20, 8%, 7%);
     --muted-foreground: hsl(24 5.4% 63.9%);
     --destructive: hsl(0 62.8% 30.6%);
     --destructive-foreground: hsl(60 9.1% 97.8%);
     --border: hsl(12 6.5% 15.1%);
     --input: hsl(12 6.5% 15.1%);
-    --ring: hsl(47.9 95.8% 53.1%);
+    --ring: hsl(48, 84%, 43%);
 
     background-color: var(--background);
     color: var(--primary);
 }
 
 .bliss {
-    font-size: 54px;
-}
-
-.text-outline {
-    color: transparent;
-    -webkit-text-stroke: 1px var(--primary);
+    font-size: 24px;
+    color: var(--primary);
+    padding-left: 20px;
 }
 
 .main-page {
@@ -93,6 +90,7 @@
 
     &:disabled {
         background-color: var(--muted);
+        color: var(--muted-foreground);
         cursor: not-allowed;
     }
 }
@@ -111,5 +109,22 @@
     padding: 10px 20px;
     color: var(--foreground);
     margin-bottom: 20px;
-    font-size: large;
+    font-size: 16px;
+}
+
+.download-link {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+    padding: 10px 20px;
+    margin-bottom: 20px;
+
+    &:hover {
+        color: var(--ring);
+    }
+}
+
+.word-count {
+    min-width: 75px;
 }
