@@ -4,6 +4,8 @@ import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 import { OPENAI_KEY } from "../keys.json";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import InvoicePDF from "./InvoicePDF"
+import { createSystemPrompt } from "./Prompt";
+import { useParams } from 'react-router-dom';
 
 const openai = new OpenAI({
   apiKey: OPENAI_KEY,
@@ -11,8 +13,9 @@ const openai = new OpenAI({
 });
 
 function App() {
+  const { type } = useParams<{ type: string }>();
   const [history, setHistory] = useState<ChatCompletionMessageParam[]>([
-    { role: "system", content: createSystemPrompt() },
+    { role: "system", content: createSystemPrompt(type ?? "") },
   ]);
   const [generating, setGenerating] = useState<boolean>(false);
   const [textareaCount, setTextareaCount] = useState<number>(0);
@@ -318,56 +321,5 @@ bijvoorbeeld een kleur, of extra service.
     </>
   );
 }
-
-const createSystemPrompt = () => {
-  let header = `
-Reageer altijd in het Nederlands.
-Jij bent een online chatbot voor een keukentafel maker. Jij helpt de klant met het vinden van het beste product.
-Reageer alleen op relevante vragen, negeer alles wat niet relevant is.
-Als er een lijst met prijzen is, geef dan een duidelijk overzicht van welke nummers waar naar verwijzen.
-Dit is de CSV data van de keukentafel maker:
-Materiaalsoort;Spatrand;Vensterbank;Boorgaten_per_stuk_mogelijk;WCD_mogelijk;Randafwerking_mogelijk;Prijs_per_m2;Randafwerking_pm;Spatrand_pm;Vensterbank_pm;Uitsparing_onderbouw;Uitsparing_inleg;Uitsparing_ruw;Kraangat;Zeepdispenser;Boorgaten_per_stuk;WCD;Achterwand_pm;Randafwerking_pm_optie2;
-Noble Desiree Grey Matt;0-150 mm;150 mm+;true;true;false;247.52;87.00;35.00;309.40;151.50;97.50;70.00;10.70;10.70;5.00;13.50;309.40;28.00;
-Noble Carrara Verzoet;150 mm+;0-150 mm;true;true;true;258.40;87.00;309.40;35.00;151.50;97.50;70.00;10.70;10.70;5.00;13.50;315.60;28.00;
-Taurus Terazzo White Verzoet;0-150 mm;0-150 mm;false;false;true;239.40;79.00;35.00;35.00;151.50;97.50;70.00;10.70;10.70;5.00;13.50;298.50;28.00;
-Taurus Terazzo Black;150 mm+;150 mm+;true;true;true;228.50;79.00;309.40;309.40;151.50;97.50;70.00;10.70;10.70;5.00;13.50;289.50;28.00;
-Glencoe Verzoet;"0-150; 150 mm+";150 mm+;false;false;true;305.50;95.00;"40; 350";340.50;151.50;97.50;70.00;10.70;10.70;5.00;13.50;315.60;28.00;
-
-Formateer je text in normale zinnen, en gebruik alleen newlines als het nodig is.
-Erg is geen mogenlijkheid voor markdown, dus gebruik geen markdown of andere styling opties.
-
-Als het gesprek afgelopen is, stuur je een AFSLUITINGS JSON bericht.
-In dit bericht Vraag je of het gesprek afgerond is, en als het afgerond is. Reageer dan met een json bericht met de volgende structuur:
-{
-  "status": "completed"
-}
-DIT IS HET AFSLUITINGS JSON.
-Alleen wanner het gesprek is afgerond, en het AFSLUITINGS JSON is gestuurd, reageer je met een json bericht met de volgende structuur:
-{
-  "items": [
-  {
-      "name": "Quartz Countertops",
-      "quantity": "8 vierkante meters",
-      "price": "€200",
-      "total_price": "€1.600"
-      "additional_info": "extra info about the product"
-  },
-  {
-      "name": "Backsplash installation",
-      "quantity": "2 lineaire meters",
-      "price": "€60",
-      "total_price": "€120"
-      "additional_info": "extra info about installation"
-  }
-  ],
-  "total_price": "€1.720"
-  "additional_info": "extra info about full order"
-}
-Laat de additional_info LEEG met een LEGE STRING als er geen extra info is. vul daar alleen iets in als het ABSOLUUT nodig is
-bijvoorbeeld een kleur, of extra service.
-Als het AFSLUITINGS JSON nog niet is gestuurd, stuur dat bericht dan eerst.
-`;
-  return header;
-};
 
 export default App;
