@@ -6,6 +6,7 @@ import { PDFDownloadLink } from "@react-pdf/renderer";
 import InvoicePDF from "./InvoicePDF"
 import { createSystemPrompt } from "./Prompt";
 import { useParams } from 'react-router-dom';
+import ReactMarkdown from "react-markdown";
 
 const openai = new OpenAI({
   apiKey: OPENAI_KEY,
@@ -240,14 +241,19 @@ bijvoorbeeld een kleur, of extra service.
           <div className="chat-history">
             {history.map((h, i) => {
               if (h.role == "system") return null;
+              if (h.role === "assistant") {
+                return (
+                  <div className="message">
+                    <p key={i}>
+                      Assistant:
+                      <ReactMarkdown>{h.content?.toString()}</ReactMarkdown>
+                    </p>
+                  </div>
+                );
+              }
               return (
                 <div className="message">
-                  <p key={i}>
-                    {h.role == "user"
-                      ? "You"
-                      : "Kitchen Assistant"}
-                    : {h.content?.toString()}
-                  </p>
+                  <p key={i}>You: {h.content?.toString()}</p>
                 </div>
               );
             })}

@@ -122,10 +122,6 @@ Mace;Wapen;Staal en hout;3 kg;Hoog;Gemiddeld;110 goudstukken;`;
 
     return `Reageer altijd in het Nederlands.
 ${custom}
-
-Formateer je text in normale zinnen, en gebruik alleen newlines als het nodig is.
-Erg is geen mogenlijkheid voor markdown, dus gebruik geen markdown of andere styling opties.
-
 Als het gesprek afgelopen is, stuur je een AFSLUITINGS JSON bericht.
 In dit bericht Vraag je of het gesprek afgerond is, en als het afgerond is. Reageer dan met een json bericht met de volgende structuur:
 {
@@ -153,8 +149,9 @@ Alleen wanner het gesprek is afgerond, en het AFSLUITINGS JSON is gestuurd, reag
   "total_price": "€1.720"
   "additional_info": "extra info about full order"
 }
-Laat de additional_info LEEG met een LEGE STRING als er geen extra info is. vul daar alleen iets in als het ABSOLUUT nodig is
-bijvoorbeeld een kleur, of extra service.
+Vul de additional_info met extra nodige informatie over de bestelling, zoals kleur, afmetingen, of andere specificaties.
+Laat de additional_info LEEG met een LEGE STRING als er geen extra info is.
 Als het AFSLUITINGS JSON nog niet is gestuurd, stuur dat bericht dan eerst.
+Laat de gebruiker nooit weten van het bestaan van het AFSLUITINGS JSON bericht.
 `;
 }
