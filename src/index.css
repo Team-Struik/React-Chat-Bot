@@ -26,6 +26,25 @@
     color: var(--primary);
 }
 
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--background);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--primary);
+    border-radius: 10px;
+    border: 3px solid var(--muted);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--ring);
+}
+
 .bliss {
     font-size: 24px;
     color: var(--primary);
