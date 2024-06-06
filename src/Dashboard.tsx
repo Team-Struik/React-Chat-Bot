@@ -1,26 +1,32 @@
 import { useNavigate } from "react-router-dom";
+import { getData, Prompt } from "./Prompt";
 
 function Dashboard() {
     const navigate = useNavigate();
+    const bots: Prompt[] = getData();
 
-    const goToBot = (type: string) => {
-        navigate(`/bot/${type}`);
+    const goToBot = (id: number) => {
+        navigate(`/bot/${id}`);
     }
 
 
     return (<>
         <h1 className="bliss">
-            <img src="/blis.svg" alt="Blis Logo" />
+            <a href="/dashboard">
+                <img src="/blis.svg" alt="Blis Logo" />
+            </a>
         </h1>
         <h1>Dashboard</h1>
-        <div className="dashboard-buttons">
-            <button onClick={() => {goToBot("keukenblad");}}>Keukenblad Maker</button>
-            <button onClick={() => {goToBot("hovenier");}}>Hovenier</button>
-            <button onClick={() => {goToBot("pcbuilder");}}>PC Maker</button>
-            <button onClick={() => {goToBot("travelagent");}}>Travel Agent</button>
-            <button onClick={() => {goToBot("gastroguide");}}>Gastro Guide</button>
-            <button onClick={() => {goToBot("retrorecommender");}}>R & R</button>
-            <button onClick={() => {goToBot("medievalsmith");}}>Medieval Smith</button>
+        <div className="dashboard">
+            {bots.map(bot => (
+                <button className="dashboard-button" key={bot.id} onClick={() => goToBot(bot.id)}>
+                    {bot.name}
+                </button>
+            ))}
+        </div>
+        <div className="under-dashboard">
+            <button className="under-dashboard-add" onClick={() => navigate("/add-prompt")}>Add Prompt</button>
+            <button className="under-dashboard-delete" onClick={() => navigate("/delete-prompt")}>Delete Prompt</button>
         </div>
     </>);
 }

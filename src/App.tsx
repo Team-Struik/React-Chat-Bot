@@ -14,9 +14,9 @@ const openai = new OpenAI({
 });
 
 function App() {
-  const { type } = useParams<{ type: string }>();
+  const { id } = useParams<{ id: string }>();
   const [history, setHistory] = useState<ChatCompletionMessageParam[]>([
-    { role: "system", content: createSystemPrompt(type ?? "") },
+    { role: "system", content: createSystemPrompt(id ?? "-1") },
   ]);
   const [generating, setGenerating] = useState<boolean>(false);
   const [textareaCount, setTextareaCount] = useState<number>(0);
@@ -24,10 +24,8 @@ function App() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [purchasedItems, setPurchasedItems] = useState<any>({});
-
   const [isImageExpanded, setIsImageExpanded] = useState<boolean>(false);
-
-  const maxTokens = 250;
+  const maxTokens = 256;
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -234,8 +232,10 @@ bijvoorbeeld een kleur, of extra service.
   return (
     <>
       <h1 className="bliss">
-        <img src="/blis.svg" alt="Blis Logo" />
-      </h1>
+          <a href="/dashboard">
+              <img src="/blis.svg" alt="Blis Logo" />
+          </a>
+        </h1>
       <div className="main-page">
         <div className="chat">
           <div className="chat-history">
