@@ -136,12 +136,13 @@ export function createSystemPrompt(id: string) {
 ${prompt.opening}
 Dit is de data van de producten:
 ${prompt.products}
-Als het gesprek afgelopen is, stuur je een AFSLUITINGS JSON bericht.
-In dit bericht Vraag je of het gesprek afgerond is, en als het afgerond is. Reageer dan met een json bericht met de volgende structuur:
+Als het gesprek afgelopen is, stuur je een AFSLUITINGS JSON.
+Eerst vraag  je of het gesprek afgerond is, en als het afgerond is. Reageer dan met een json bericht met de volgende structuur:
 {
   "status": "completed"
 }
 DIT IS HET AFSLUITINGS JSON.
+De afsluitings JSON is een intern bericht dat aangeeft dat het gesprek is afgerond. Dus je laat de gebruiker NOOIT weten dat er een AFSLUITINGS JSON word gestuurd.
 Alleen wanner het gesprek is afgerond, en het AFSLUITINGS JSON is gestuurd, reageer je met een json bericht met de volgende structuur:
 {
   "items": [
@@ -170,7 +171,7 @@ Laat de gebruiker nooit weten van het bestaan van het AFSLUITINGS JSON bericht.
 `;
 }
 
-export function getData() :Prompt[] {
+export function getData(): Prompt[] {
     const prompts = localStorage.getItem('prompts');
     if (prompts) {
         return JSON.parse(prompts);
@@ -195,7 +196,21 @@ export const AddPrompt = () => {
     const [name, setName] = useState('');
     const [opening, setOpening] = useState('');
     const [products, setProducts] = useState('');
+    const [fileName, setFileName] = useState('');
     const navigate = useNavigate();
+
+    const handleFileRead = (e: ProgressEvent<FileReader>) => {
+        const content = (e.target as FileReader).result as string;
+        setProducts(content);
+    };
+
+    const handleFileChosen = (file: File) => {
+        let fileReader = new FileReader();
+        fileReader.onloadend = handleFileRead;
+        fileReader.readAsText(file);
+        setFileName(file.name);
+    };
+
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -203,51 +218,62 @@ export const AddPrompt = () => {
         navigate('/dashboard');
     }
 
+
     return (
-    <>
-        <h1 className="bliss">
-            <a href="/dashboard">
-                <img src="/blis.svg" alt="Blis Logo" />
-            </a>
-        </h1>
-        <div className="main-page">
-            <form className="chat" onSubmit={handleSubmit}>
-                <div className="prompt-fields">
-                    <label className="bliss">Naam:</label>
-                    <textarea
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        required
-                        rows={2}
-                        className="styled-textarea"
-                    />
-                </div>
-                <div className="prompt-fields">
-                    <label className="bliss">Opening:</label>
-                    <textarea
-                        value={opening}
-                        onChange={(e) => setOpening(e.target.value)}
-                        required
-                        rows={4}
-                        className="styled-textarea"
-                    />
-                </div>
-                <div className="prompt-fields">
-                    <label className="bliss">Products:</label>
-                    <textarea
-                        value={products}
-                        onChange={(e) => setProducts(e.target.value)}
-                        required
-                        rows={4}
-                        className="styled-textarea"
-                    />
-                </div>
-                <div className="textarea-wrapper">
-                    <button type="submit" className="styled-button">Add Prompt</button>
-                </div>
-            </form>
-        </div>
-    </>
+        <>
+            <h1 className="bliss">
+                <a href="/dashboard">
+                    <img src="/blis.svg" alt="Blis Logo" />
+                </a>
+            </h1>
+            <div className="main-page">
+                <form className="chat" onSubmit={handleSubmit}>
+                    <div className="prompt-fields">
+                        <label className="bliss">Naam:</label>
+                        <p className='disclaimer'>De naam van de chatbot. Dit is de naam die de klant ziet wanneer de chatbot zich voorstelt.</p>
+                        <textarea
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            required
+                            rows={2}
+                            className="styled-textarea"
+                        />
+                    </div>
+                    <div className="prompt-fields">
+                        <label className="bliss">Opening:</label>
+                        <p className='disclaimer'>De opening is een stukje tekst dat de chatbot gebruikt om zichzelf voor te stellen. Dit stukje tekst moet kort en bondig zijn, en de klant een idee geven van wat de chatbot doet.</p>
+                        <textarea
+                            value={opening}
+                            onChange={(e) => setOpening(e.target.value)}
+                            required
+                            rows={4}
+                            className="styled-textarea"
+                        />
+                    </div>
+                    <div className="product-data">
+                        <label className="bliss">Product:</label>
+                        <button type="button" className="styled-button" onClick={() => document.getElementById('input-file')?.click()}>Upload Data</button>
+                        <input
+                            id="input-file"
+                            type="file"
+                            accept=".csv, .txt, .json"
+                            onChange={e => {
+                                if (e.target.files) {
+                                    handleFileChosen(e.target.files[0]);
+                                }
+                            }}
+                            required
+                            style={{ display: "none" }}
+                            className='styled-file-input'
+                        />
+                    </div>
+                    {fileName && <p className="file-name"> {fileName}</p>}
+                    <div className="textarea-wrapper">
+                        <button type="submit" className="styled-button">Add Prompt</button>
+                    </div>
+                </form>
+            </div>
+        </>
     );
 }
 
@@ -262,20 +288,20 @@ export const DeletePrompt = () => {
     }
 
     return (
-    <>
-        <h1 className="bliss">
-            <a href="/dashboard">
-                <img src="/blis.svg" alt="Blis Logo" />
-            </a>
-        </h1>
-        <h1>Delete Prompt</h1>
-        <div className="dashboard">
-            {prompts.map(bot => (
-                <button className="delete-button" key={bot.id} onClick={() => deletePrompt(bot.id)}>
-                    {bot.name}
-                </button>
-            ))}
-        </div>
-    </>
+        <>
+            <h1 className="bliss">
+                <a href="/dashboard">
+                    <img src="/blis.svg" alt="Blis Logo" />
+                </a>
+            </h1>
+            <h1>Delete Prompt</h1>
+            <div className="dashboard">
+                {prompts.map(bot => (
+                    <button className="delete-button" key={bot.id} onClick={() => deletePrompt(bot.id)}>
+                        {bot.name}
+                    </button>
+                ))}
+            </div>
+        </>
     );
 }

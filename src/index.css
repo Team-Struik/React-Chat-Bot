@@ -59,6 +59,7 @@
     align-items: center;
     height: 80vh;
 }
+
 .chat {
     display: flex;
     flex-direction: column;
@@ -186,10 +187,10 @@
 .styled-textarea {
     width: 100%;
     padding: 10px;
-    border: 2px solid var(--primary);
+    border: 2px solid hsl(47, 85%, 25%);
     border-radius: 8px;
     resize: none;
-    background-color: var(--secondary);
+    background-color: hsl(12, 6%, 12%);
     color: var(--foreground);
 }
 
@@ -211,6 +212,43 @@
 }
 
 .styled-button:hover:enabled {
+    background-color: var(--ring);
+}
+
+.styled-file-input {
+    display: block;
+    padding: 10px;
+    font-size: 16px;
+    color: var(--foreground);
+    background-color: var(--input);
+    border: none;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: var(--primary);
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.styled-button {
+    padding: 10px 20px;
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 0 auto;
+}
+
+.file-name {
+    margin: 0 auto;
+}
+
+.styled-file-input:hover {
     background-color: var(--ring);
 }
 
@@ -260,4 +298,19 @@
 
 .under-dashboard button:hover {
     background-color: var(--ring);
+}
+
+.disclaimer {
+    font-size: 0.875em;
+    color: #fff;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+.product-data {
+    padding: 20px;
+    background-color: var(--secondary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
