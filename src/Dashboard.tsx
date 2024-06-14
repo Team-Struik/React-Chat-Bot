@@ -25,8 +25,8 @@ function Dashboard() {
             ))}
         </div>
         <div className="under-dashboard">
-            <button className="under-dashboard-add" onClick={() => navigate("/add-prompt")}>Add Prompt</button>
-            <button className="under-dashboard-delete" onClick={() => navigate("/delete-prompt")}>Delete Prompt</button>
+            <button className="under-dashboard-add" onClick={() => navigate("/add-prompt")}>Add Bot</button>
+            <button className="under-dashboard-delete" onClick={() => navigate("/delete-prompt")}>Delete Bot</button>
         </div>
     </>);
 }

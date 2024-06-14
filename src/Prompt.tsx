@@ -1,12 +1,12 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const errorMessage = `Reageer op geen vragen, en stuur geen berichten. Er is een fout opgetreden, en zorg er voor dat de klant de chatbot opnieuw opstart. Reageer kort`;
 
 export const initialData: Prompt[] = [
     {
         id: 0,
-        name: 'Keukentafel maker',
+        name: "Keukentafel maker",
         opening: `Jij bent een online chatbot voor een keukentafel maker. Jij helpt de klant met het vinden van het beste product.`,
         products: `Materiaalsoort;Spatrand;Vensterbank;Boorgaten_per_stuk_mogelijk;WCD_mogelijk;Randafwerking_mogelijk;Prijs_per_m2;Randafwerking_pm;Spatrand_pm;Vensterbank_pm;Uitsparing_onderbouw;Uitsparing_inleg;Uitsparing_ruw;Kraangat;Zeepdispenser;Boorgaten_per_stuk;WCD;Achterwand_pm;Randafwerking_pm_optie2;
 Noble Desiree Grey Matt;0-150 mm;150 mm+;true;true;false;247.52;87.00;35.00;309.40;151.50;97.50;70.00;10.70;10.70;5.00;13.50;309.40;28.00;
@@ -69,9 +69,9 @@ IJsland;Gletsjerwandelen;Winter;5 dagen;Hoog;€1300.00;`
         opening: `Jij bent GastroGuide, een online chatbot voor culinaire liefhebbers. Jij helpt de klant met het vinden van de beste recepten, kooktechnieken, en ingrediënten.`,
         products: `Gerecht;Type;Keuken;Moeilijkheidsgraad;Bereidingstijd;Ingrediënten;Prijs;
 Spaghetti Carbonara;Hoofdgerecht;Italiaans;Middel;30 minuten;Spaghetti, Eieren, Pancetta, Parmezaanse kaas, Zwarte peper;€10.00;
-Pad Thai;Hoofdgerecht;Thais;Middel;40 minuten;Rijstnoedels, Garnalen, Tofu, Eieren, Taugé, Pinda's, Tamarindepasta;€12.00;
+Pad Thai;Hoofdgerecht;Thais;Middel;40 minuten;Rijstnoedels, Garnalen, Tofu, Eieren, Taugé, Pinda"s, Tamarindepasta;€12.00;
 Sushi;Hoofdgerecht;Japans;Hoog;60 minuten;Sushirijst, Nori, Zalm, Tonijn, Avocado, Sojasaus, Wasabi;€20.00;
-Guacamole;Bijgerecht;Mexicaans;Laag;15 minuten;Avocado's, Limoensap, Tomaten, Uien, Koriander, Zout;€5.00;
+Guacamole;Bijgerecht;Mexicaans;Laag;15 minuten;Avocado"s, Limoensap, Tomaten, Uien, Koriander, Zout;€5.00;
 Croissants;Ontbijt;Frans;Hoog;3 uur;Bloem, Boter, Melk, Suiker, Gist, Zout;€8.00;
 Chicken Tikka Masala;Hoofdgerecht;Indiaas;Middel;45 minuten;Kip, Tomatenpuree, Yoghurt, Knoflook, Gember, Garam masala;€15.00;
 Falafel;Hoofdgerecht;Midden-Oosters;Laag;30 minuten;Kikkererwten, Knoflook, Peterselie, Komijn, Koriander, Zout;€7.00;
@@ -172,31 +172,31 @@ Laat de gebruiker nooit weten van het bestaan van het AFSLUITINGS JSON bericht.
 }
 
 export function getData(): Prompt[] {
-    const prompts = localStorage.getItem('prompts');
+    const prompts = localStorage.getItem("prompts");
     if (prompts) {
         return JSON.parse(prompts);
     } else {
-        localStorage.setItem('prompts', JSON.stringify(initialData));
+        localStorage.setItem("prompts", JSON.stringify(initialData));
         return initialData;
     }
 }
 
 export function setData(data: Prompt[]) {
-    localStorage.setItem('prompts', JSON.stringify(data));
+    localStorage.setItem("prompts", JSON.stringify(data));
 }
 
 export function addItem(item: Prompt) {
     const prompts = getData();
     item.id = Math.max(...prompts.map(p => p.id)) + 1;
     prompts.push(item);
-    localStorage.setItem('prompts', JSON.stringify(prompts));
+    localStorage.setItem("prompts", JSON.stringify(prompts));
 }
 
 export const AddPrompt = () => {
-    const [name, setName] = useState('');
-    const [opening, setOpening] = useState('');
-    const [products, setProducts] = useState('');
-    const [fileName, setFileName] = useState('');
+    const [name, setName] = useState("");
+    const [opening, setOpening] = useState("");
+    const [products, setProducts] = useState("");
+    const [fileName, setFileName] = useState("");
     const navigate = useNavigate();
 
     const handleFileRead = (e: ProgressEvent<FileReader>) => {
@@ -215,9 +215,8 @@ export const AddPrompt = () => {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         addItem({ id: -1, name, opening, products });
-        navigate('/dashboard');
+        navigate("/dashboard");
     }
-
 
     return (
         <>
@@ -228,20 +227,22 @@ export const AddPrompt = () => {
             </h1>
             <div className="main-page">
                 <form className="chat" onSubmit={handleSubmit}>
-                    <div className="prompt-fields">
-                        <label className="bliss">Naam:</label>
-                        <p className='disclaimer'>De naam van de chatbot. Dit is de naam die de klant ziet wanneer de chatbot zich voorstelt.</p>
-                        <textarea
+                    <div className="prompt-fields padding-top-20">
+                        <label className="add-prompt-label">Naam</label>
+                        <p className="disclaimer">De naam van de chatbot. Dit is de naam die de klant ziet wanneer de chatbot zich voorstelt.</p>
+                        <input
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             required
-                            rows={2}
-                            className="styled-textarea"
-                        />
+                            className="styled-textarea"/>
                     </div>
                     <div className="prompt-fields">
-                        <label className="bliss">Opening:</label>
-                        <p className='disclaimer'>De opening is een stukje tekst dat de chatbot gebruikt om zichzelf voor te stellen. Dit stukje tekst moet kort en bondig zijn, en de klant een idee geven van wat de chatbot doet.</p>
+                        <label className="add-prompt-label">Opening</label>
+                        <p className="disclaimer">
+                            De opening is een stukje tekst dat de chatbot gebruikt om zichzelf voor te stellen.
+                            <br />
+                            Dit stukje tekst moet kort en bondig zijn, en de klant een idee geven van wat de chatbot doet.
+                        </p>
                         <textarea
                             value={opening}
                             onChange={(e) => setOpening(e.target.value)}
@@ -250,9 +251,10 @@ export const AddPrompt = () => {
                             className="styled-textarea"
                         />
                     </div>
-                    <div className="product-data">
-                        <label className="bliss">Product:</label>
-                        <button type="button" className="styled-button" onClick={() => document.getElementById('input-file')?.click()}>Upload Data</button>
+                    <div className="prompt-fields">
+                        <label className="add-prompt-label">Producten</label>
+                        <p className="disclaimer">Upload een CSV, JSON of TXT bestand met de producten die de chatbot moet gebruiken.</p>
+                        <button type="button" className="styled-button" onClick={() => document.getElementById("input-file")?.click()}>Upload Data</button>
                         <input
                             id="input-file"
                             type="file"
@@ -264,12 +266,14 @@ export const AddPrompt = () => {
                             }}
                             required
                             style={{ display: "none" }}
-                            className='styled-file-input'
+                            className="styled-file-input"
                         />
+                        {fileName && <p className="file-name">Gekozen bestand: {fileName}</p>}
                     </div>
-                    {fileName && <p className="file-name"> {fileName}</p>}
-                    <div className="textarea-wrapper">
+
+                    <div className="button-wrapper">
                         <button type="submit" className="styled-button">Add Prompt</button>
+                        <button type="button" className="styled-button" onClick={() => navigate("/dashboard")}>Cancel</button>
                     </div>
                 </form>
             </div>
@@ -284,7 +288,7 @@ export const DeletePrompt = () => {
     const deletePrompt = (id: number) => {
         const newPrompts = prompts.filter(p => p.id !== id);
         setData(newPrompts);
-        navigate('/dashboard');
+        navigate("/dashboard");
     }
 
     return (

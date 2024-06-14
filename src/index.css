@@ -175,8 +175,11 @@
     background-color: var(--ring);
 }
 
+.padding-top-20 {
+    padding-top: 20px;
+}
+
 .prompt-fields {
-    padding: 20px;
     background-color: var(--secondary);
     display: flex;
     flex-direction: column;
@@ -185,9 +188,11 @@
 }
 
 .styled-textarea {
-    width: 100%;
+    width: 50%;
     padding: 10px;
     border: 2px solid hsl(47, 85%, 25%);
+    font-size: large;
+    font-family: "Geist";
     border-radius: 8px;
     resize: none;
     background-color: hsl(12, 6%, 12%);
@@ -246,6 +251,7 @@
 
 .file-name {
     margin: 0 auto;
+    color: var(--ring);
 }
 
 .styled-file-input:hover {
@@ -313,4 +319,23 @@
     display: flex;
     align-items: center;
     gap: 10px;
+}
+
+.button-wrapper {
+    padding: 20px;
+    background-color: var(--secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.button-wrapper button {
+    margin: 8px;
+    width: 10%;
+}
+
+.add-prompt-label {
+    font-size: 24px;
+    color: var(--primary);
 }
