@@ -41,33 +41,35 @@ function App() {
   };
 
   const handleSubmit = async () => {
-    const m: ChatCompletionMessageParam = { role: "user", content: prompt };
+    let m: ChatCompletionMessageParam;
+
 
     setGenerating(true);
     let response;
     if (imageFile) {
       const base64Image = await encodeImage(imageFile);
+      m = {
+        role: "user",
+        content: [
+          { type: "text", text: prompt },
+          {
+            type: "image_url",
+            image_url: {
+              url: `data:image/jpeg;base64,${base64Image}`,
+            },
+          },
+        ],
+      };
       response = await openai.chat.completions.create({
         messages: [
           ...history,
           m,
-          {
-            role: "user",
-            content: [
-              { type: "text", text: prompt },
-              {
-                type: "image_url",
-                image_url: {
-                  url: `data:image/jpeg;base64,${base64Image}`,
-                },
-              },
-            ],
-          },
         ],
         model: "gpt-4o",
       });
       setImageFile(null);
     } else {
+      m = { role: "user", content: prompt };
       response = await openai.chat.completions.create({
         messages: [...history, m],
         model: "gpt-4o",
@@ -253,6 +255,24 @@ bijvoorbeeld een kleur, of extra service.
                       Assistant:
                       <ReactMarkdown>{h.content?.toString()}</ReactMarkdown>
                     </p>
+                  </div>
+                );
+              }
+              // check if content is an array
+              if (Array.isArray(h.content)) {
+                return (
+                  <div className="message">
+                    <p key={i}>You: {h.content[0].type == "text" ? h.content[0].text : ""}</p>
+                    <img
+                      src={h.content[1].type == "image_url" ? h.content[1].image_url.url : ""}
+                      alt="User Image"
+                      style={{
+                        width: "200px",
+                        height: "auto",
+                        minWidth: "200px",
+                        objectFit: "contain",
+                      }}
+                    />
                   </div>
                 );
               }
