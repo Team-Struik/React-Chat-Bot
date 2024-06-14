@@ -17,6 +17,7 @@ function App() {
   const { id } = useParams<{ id: string }>();
   const [history, setHistory] = useState<ChatCompletionMessageParam[]>([
     { role: "system", content: createSystemPrompt(id ?? "-1") },
+    { role: "assistant", content: `Hallo! Waarmee kan ik u van dienst zijn?`}
   ]);
   const [generating, setGenerating] = useState<boolean>(false);
   const [textareaCount, setTextareaCount] = useState<number>(0);
@@ -41,8 +42,8 @@ function App() {
 
   const handleSubmit = async () => {
     const m: ChatCompletionMessageParam = { role: "user", content: prompt };
-    setGenerating(true);
 
+    setGenerating(true);
     let response;
     if (imageFile) {
       const base64Image = await encodeImage(imageFile);
@@ -209,6 +210,10 @@ bijvoorbeeld een kleur, of extra service.
     setTextareaCount(0);
     setHistory([...history, m, response.choices[0].message]);
     setGenerating(false);
+    setImageFile(null);
+    setImagePreview(null);
+
+    console.log(history);
   };
 
   const encodeImage = async (file: File): Promise<string> => {
@@ -300,8 +305,20 @@ bijvoorbeeld een kleur, of extra service.
                   setTextareaCount(e.target.value.length);
                   setPrompt(e.target.value);
                 }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    if (e.shiftKey) {
+                      return;
+                    } else {
+                    handleSubmit();
+                    e.preventDefault();
+                    }
+                  }
+                }
+              }
               />
               <label
+              className="styled-button"
                 htmlFor="image-upload"
               >
                 {imageFile ? imageFile.name : "Upload Image"}
@@ -329,3 +346,5 @@ bijvoorbeeld een kleur, of extra service.
 }
 
 export default App;
+
+
