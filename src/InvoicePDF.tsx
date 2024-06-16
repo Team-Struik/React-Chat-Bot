@@ -182,7 +182,7 @@ const InvoicePDF = ({ invoiceData }: { invoiceData: any }) => (
         </View>
 
         <View style={styles.footer}>
-            <Text>Bank Name: Lorem Ipsum</Text>
+            <Text>Bank Name: Blis Banking</Text>
             <Text>Bank Account: 1234567890</Text>
             <Text>If you have any questions, please contact us at blis@digital.com</Text>
         </View>
