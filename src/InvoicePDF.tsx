@@ -130,7 +130,7 @@ const InvoicePDF = ({ invoiceData }: { invoiceData: any }) => (
             </Svg>
             <View style={styles.companyDetails}>
                 <Text>Blis Digital</Text>
-                <Text>1234 AB, Lorem Ipsum</Text>
+                <Text>1234 AB, Straat</Text>
                 <Text>Tel: 123 456 7890</Text>
             </View>
         </View>
@@ -142,9 +142,9 @@ const InvoicePDF = ({ invoiceData }: { invoiceData: any }) => (
             </View>
             <View style={styles.section}>
                 <Text>Voor:</Text>
-                <Text>Lorem Ipsum</Text>
-                <Text>Lorem Ipsum</Text>
-                <Text>Lorem Ipsum, 1234 AB</Text>
+                <Text>Naam</Text>
+                <Text>Plaats</Text>
+                <Text>Straat, 1234 AB</Text>
             </View>
         </View>
 
@@ -184,7 +184,7 @@ const InvoicePDF = ({ invoiceData }: { invoiceData: any }) => (
         <View style={styles.footer}>
             <Text>Bank Name: Lorem Ipsum</Text>
             <Text>Bank Account: 1234567890</Text>
-            <Text>If you have any questions, please contact us at lorem@ipsum.com</Text>
+            <Text>If you have any questions, please contact us at blis@digital.com</Text>
         </View>
     </Page>
   </Document>
