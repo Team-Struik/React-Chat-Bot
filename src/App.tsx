@@ -17,7 +17,7 @@ function App() {
   const { id } = useParams<{ id: string }>();
   const [history, setHistory] = useState<ChatCompletionMessageParam[]>([
     { role: "system", content: createSystemPrompt(id ?? "-1") },
-    { role: "assistant", content: `Hallo! Waarmee kan ik u van dienst zijn?`}
+    { role: "assistant", content: `Hallo! Waarmee kan ik u van dienst zijn?` }
   ]);
   const [generating, setGenerating] = useState<boolean>(false);
   const [textareaCount, setTextareaCount] = useState<number>(0);
@@ -239,10 +239,10 @@ bijvoorbeeld een kleur, of extra service.
   return (
     <>
       <h1 className="bliss">
-          <a href="/dashboard">
-              <img src="/blis.svg" alt="Blis Logo" />
-          </a>
-        </h1>
+        <a href="/dashboard">
+          <img src="/blis.svg" alt="Blis Logo" />
+        </a>
+      </h1>
       <div className="main-page">
         <div className="chat">
           <div className="chat-history">
@@ -284,9 +284,9 @@ bijvoorbeeld een kleur, of extra service.
             })}
             {purchasedItems.items &&
               <PDFDownloadLink className="download-link" document={<InvoicePDF invoiceData={purchasedItems} />} fileName="invoice.pdf">
-                  {({ blob, url, loading, error }) =>
-                      loading ? 'Loading document...' : 'Download Invoice'
-                  }
+                {({ blob, url, loading, error }) =>
+                  loading ? 'Loading document...' : 'Download Invoice'
+                }
               </PDFDownloadLink>}
           </div>
           <div className="textarea-wrapper">
@@ -330,15 +330,17 @@ bijvoorbeeld een kleur, of extra service.
                     if (e.shiftKey) {
                       return;
                     } else {
-                    handleSubmit();
-                    e.preventDefault();
+                      if (prompt.trim() !== "") {
+                        handleSubmit();
+                      }
+                      e.preventDefault();
                     }
                   }
                 }
-              }
+                }
               />
               <label
-              className="styled-button"
+                className="styled-button"
                 htmlFor="image-upload"
               >
                 {imageFile ? imageFile.name : "Upload Image"}
